@@ -20,12 +20,16 @@
             // Split input and store in mealItems array
             var mealItems = $scope.commaSeparatedLunchItemsInput.split(",");
 
-            // Check for length of array (= number of items)
-            // and set message accordingly
-            if (mealItems.length <= 3) {
-                $scope.message = "Enjoy!";
+            // Check if input is empty
+            // If not, check number of items and set message accordingly
+            if ($scope.commaSeparatedLunchItemsInput == "") {
+                $scope.message = "Please enter data first";
             } else {
-                $scope.message = "Too much!";
+                if (mealItems.length <= 3) {
+                    $scope.message = "Enjoy!";
+                } else {
+                    $scope.message = "Too much!";
+                }
             }
             
         };
