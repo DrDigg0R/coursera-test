@@ -18,14 +18,16 @@
              <input id="lunch-menu" type="text"
              placeholder="list comma separated dishes you usually have for lunch"
              class="form-control"
-             ng-model="commaSeparatedLunchItemsInput">
+             ng-model="commaSeparatedLunchItemsInput"
+             ng-style="inputStyling">
          </div>
          <div class="form-group">
              <button class="btn btn-default"
              ng-click="evaluateMeal()">Check If Too Much</button>
          </div>
          <div class="form-group message"
-          ng-model="message">
+          ng-model="message"
+          ng-style="messageStyling">
            <!-- Your message can go here. -->
            {{message}}
          </div>

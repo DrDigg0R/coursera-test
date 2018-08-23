@@ -23,8 +23,15 @@
             // Check if input is empty
             // If not, check number of items and set message accordingly
             if ($scope.commaSeparatedLunchItemsInput == "") {
+                // Set color to red
+                $scope.messageStyling = {"color" : "red"};
+                $scope.inputStyling = {"border-color" : "red"};
                 $scope.message = "Please enter data first";
             } else {
+                // Set color to green
+                $scope.messageStyling = {"color" : "lightgreen"};
+                $scope.inputStyling = {"border-color" : "lightgreen"};
+
                 if (mealItems.length <= 3) {
                     $scope.message = "Enjoy!";
                 } else {
