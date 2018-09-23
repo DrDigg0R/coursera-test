@@ -3,73 +3,95 @@
 
 angular.module('NarrowItDownApp', [])
 .controller('NarrowItDownController', NarrowItDownController)
-.service('MenuSearchService', MenuSearchService)
-.constant('ApiBasePath', "https://davids-restaurant.herokuapp.com")
-.directive('foundItems', FoundItems);
+//.service('MenuSearchService', MenuSearchService)
+.factory('MenuSearchFactory', MenuSearchFactory)
+.directive('foundItems', FoundItems)
+.constant('ApiBasePath', "https://davids-restaurant.herokuapp.com");
+
 
 function FoundItems() {
   var ddo = {
-    templateUrl: 'narrowedList.html',
+    templateUrl: 'foundItems.html',
     scope: {
-      onRemove: "&"
-    },
-    controller: NarrowItDownController,
-    controllerAs: 'narrowCtrl',
-    bindToController: true
+      narrowCtrl: '<narrowCtrl',
+      onRemove: '&'
+     },
+    // controller: NarrowItDownController,
+    // controllerAs: 'narrowCtrl',
+    // bindToController: true
+  };
+  return ddo;
+
+} // End FoundItems directive
+
+
+NarrowItDownController.$inject = ['MenuSearchFactory'];
+function NarrowItDownController(MenuSearchFactory) {
+  var narrowCtrl = this;
+  narrowCtrl.found = [];
+  narrowCtrl.searchTerm = "";
+
+  // Use MenuSearchFactory to create new MenuSearchService
+  var menuSearchService = MenuSearchFactory();
+  
+  narrowCtrl.narrowItDown = function () {
+    var promise = menuSearchService.getMatchedMenuItems(narrowCtrl.searchTerm);
+  
+    promise.then(function (response) {
+      narrowCtrl.found = response;
+    })
+    .catch(function (error) {
+      console.log("Error: " + error);
+    });  
   };
 
-  return ddo;
-}
+  narrowCtrl.removeItem = function (itemIndex) {
+    menuSearchService.removeItem(itemIndex);
+  };
 
-NarrowItDownController.$inject = ['MenuSearchService'];
-function NarrowItDownController(MenuSearchService) {
-  var narrowCtrl = this;
-  var found = [];
-  
+} // End NarrowItDownController
 
-  var promise = MenuSearchService.getMatchedMenuItems();
+MenuSearchService.$inject = ['ApiBasePath', '$http'];
+function MenuSearchService(ApiBasePath, $http) {
 
-  promise.then(function(response) {
-    //narrowCtrl.found = response.data;
-    console.log(response.data);
-  })
-  .catch(function (error) {
-    console.log(error);
-  })
+  var menuSearchService = this;
 
-  console.log(found);
+  menuSearchService.getMatchedMenuItems = function (searchTerm) {
 
-}
+    menuSearchService.foundItems = [];
 
-MenuSearchService.$inject = ['$http', 'ApiBasePath'];
-function MenuSearchService ($http, ApiBasePath) {
-
-  var menuService = this;
-
-  menuService.getMatchedMenuItems = function (searchTerm) {
-    var response = $http({
-      method: "GET",
-      url: (ApiBasePath + "/menu_items.json")
-    }).then(function (result) {
+    var response = $http.get(ApiBasePath + "/menu_items.json")
+    .then(function (result) {
       // process result and only keep items that match
-      var foundItems = [];
 
       for (var i = 0; i < result.data.menu_items.length; i++) {
         var curItemDescription = result.data.menu_items[i].description;
         
-        if (curItemDescription.toLowerCase().indexOf("chicken") !== -1) {
-          foundItems.push(result.data.menu_items[i]);
+        if (curItemDescription.toLowerCase().indexOf(searchTerm) !== -1) {
+          menuSearchService.foundItems.push(result.data.menu_items[i]);
         }
       }
 
-      console.log("FoundItems in MenuSearchService:" + foundItems);
-
-      return foundItems;
-    });
-
+      return menuSearchService.foundItems;
+    }, function (error) {
+      console.log("Error Messsage = " + error);
+    }); // End .then
     return response;
+  } // End getMatchedMenuItems()
+
+  menuSearchService.removeItem = function (itemIndex) {
+    menuSearchService.foundItems.splice(itemIndex, 1);
   };
 
-}
+} // End MenuSearchService
+
+MenuSearchFactory.$inject = ['ApiBasePath', '$http'];
+function MenuSearchFactory(ApiBasePath, $http) {
+  var factory = function () {
+    return new MenuSearchService(ApiBasePath, $http);
+  };
+
+  return factory;
+} // End MenuSearchFactory
 
 })();
