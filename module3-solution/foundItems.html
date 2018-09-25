@@ -1,5 +1,5 @@
 <li ng-repeat="item in list.items">
     <strong>{{ item.name }}</strong> ({{ item.short_name }}) <em>{{ item.description }}</em>
-    <button ng-click="list.onRemove({index: $index});" class="btn btn-danger">Remove Item</button>
+    <button ng-click="list.onRemove({index: $index});" class="btn btn-sm btn-danger">Remove Item</button>
 </li>
 <div ng-if="list.listEmptyChecker()">Nothing found</div>
