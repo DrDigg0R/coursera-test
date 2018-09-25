@@ -16,36 +16,53 @@ function FoundItems() {
       items: '<',
       onRemove: '&'
      },
-    // controller: NarrowItDownController,
-    // controllerAs: 'narrowCtrl',
-    // bindToController: true
+    controller: FoundItemsDirectiveController,
+    controllerAs: 'list',
+    bindToController: true
   };
   return ddo;
 
 } // End FoundItems directive
 
+function FoundItemsDirectiveController() {
+  var list = this;
+  console.log("called at least...");
+  console.log(list.items);
+
+  list.listEmptyChecker = function () {
+    return typeof list.items !== 'undefined' && list.items.length === 0
+    };
+
+} 
 
 NarrowItDownController.$inject = ['MenuSearchFactory'];
 function NarrowItDownController(MenuSearchFactory) {
   var narrowCtrl = this;
-  narrowCtrl.found = [];
-  narrowCtrl.searchTerm = "";
+  //narrowCtrl.found = [];
+  //narrowCtrl.searchTerm = "";
 
   // Use MenuSearchFactory to create new MenuSearchService
   var menuSearchService = MenuSearchFactory();
   
   narrowCtrl.narrowItDown = function () {
-    var promise = menuSearchService.getMatchedMenuItems(narrowCtrl.searchTerm);
-  
-    promise.then(function (response) {
-      narrowCtrl.found = response;
-    })
-    .catch(function (error) {
-      console.log("Error: " + error);
-    });  
+    if (narrowCtrl.searchTerm) {
+      var promise = menuSearchService.getMatchedMenuItems(narrowCtrl.searchTerm);
+    
+      promise.then(function (response) {
+        narrowCtrl.found = response;
+        console.log("response in NarrowItDownController item 1 = " + response[1]);
+
+      })
+      .catch(function (error) {
+        console.log("Error: " + error);
+      });  
+    } else {
+      narrowCtrl.found = [];
+    }
   };
 
   narrowCtrl.removeItem = function (itemIndex) {
+    console.log("removeItem() called with " + itemIndex);
     menuSearchService.removeItem(itemIndex);
   };
 
@@ -60,7 +77,7 @@ function MenuSearchService(ApiBasePath, $http) {
 
     menuSearchService.foundItems = [];
 
-    var response = $http.get(ApiBasePath + "/menu_items.json")
+    return $http.get(ApiBasePath + "/menu_items.json")
     .then(function (result) {
       // process result and only keep items that match
 
@@ -76,7 +93,7 @@ function MenuSearchService(ApiBasePath, $http) {
     }, function (error) {
       console.log("Error Messsage = " + error);
     }); // End .then
-    return response;
+
   } // End getMatchedMenuItems()
 
   menuSearchService.removeItem = function (itemIndex) {
