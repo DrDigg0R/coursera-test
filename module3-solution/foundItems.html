@@ -1,4 +1,4 @@
-<li ng-repeat="item in narrowCtrl.found">
+<li ng-repeat="item in items">
     <strong>{{ item.name }}</strong> ({{ item.short_name }}) <em>{{ item.description }}</em>
     <button ng-click="narrowCtrl.removeItem({index: $index});">Remove Item</button>
 </li>

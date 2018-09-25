@@ -13,7 +13,7 @@ function FoundItems() {
   var ddo = {
     templateUrl: 'foundItems.html',
     scope: {
-      narrowCtrl: '<narrowCtrl',
+      items: '<',
       onRemove: '&'
      },
     // controller: NarrowItDownController,
